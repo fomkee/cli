@@ -1,0 +1,12 @@
+Monitors · 1 on this page
+
+● Active · HTTP
+
+GET https://example.com/health
+
+References
+  Name       Rbasovo
+  Monitor    361aca90-733d-4b11-a398-ad961bfd7e48
+
+More monitors available. Continue with
+--after opaque-cursor

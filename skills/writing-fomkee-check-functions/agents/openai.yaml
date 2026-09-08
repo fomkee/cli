@@ -1,0 +1,4 @@
+interface:
+  display_name: "Write Fomkee Check Functions"
+  short_description: "Author and debug Fomkee JavaScript checks"
+  default_prompt: "Use $writing-fomkee-check-functions to write or review a Fomkee JavaScript check."

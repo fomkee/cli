@@ -1,0 +1,15 @@
+
+  ● Active · HTTP
+
+  GET https://example.com/health
+
+  Checks
+    Every     5 minutes
+    Timeout   10 seconds
+    Expected  Any successful HTTP status
+
+  References
+    Name       Rbasovo
+    Monitor    361aca90-733d-4b11-a398-ad961bfd7e48
+
+  Use --details for secondary settings and history.

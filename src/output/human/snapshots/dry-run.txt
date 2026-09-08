@@ -1,0 +1,20 @@
+Dry run · Failed
+
+HTTP check
+  Result   Passed
+  Summary  HTTP check passed
+
+Response
+  Kind         http
+  HTTP status  200
+  Latency      42 ms
+
+Function
+  Result   Failed
+  Summary  Assertion failed
+  Reason   validation
+
+Console
+  [error] Missing field
+
+Use --details for attempts and execution metadata.

@@ -1,0 +1,22 @@
+
+  ● Active · HTTP
+
+  GET https://example.com/health
+
+  Checks
+    Every     5 minutes
+    Timeout   10 seconds
+    Expected  Any successful HTTP status
+
+  Retries
+    Attempts  3 maximum
+    Backoff   1 second initially, 30 seconds maximum
+
+  History
+    Created  7 Sep 2026 at 19:17:31 UTC
+
+    Updated  7 Sep 2026 at 19:17:31 UTC
+
+  References
+    Name       Rbasovo
+    Monitor    361aca90-733d-4b11-a398-ad961bfd7e48

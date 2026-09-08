@@ -1,0 +1,134 @@
+name: verify-and-release
+on:
+  push:
+    tags: ['v*']
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: cli-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            binary: fomkeecli
+            target: x86_64-unknown-linux-gnu
+            asset: fomkeecli-Linux-x86_64
+          - os: macos-15
+            binary: fomkeecli
+            target: aarch64-apple-darwin
+            asset: fomkeecli-Darwin-arm64
+          - os: macos-15-intel
+            binary: fomkeecli
+            target: x86_64-apple-darwin
+            asset: fomkeecli-Darwin-x86_64
+          - os: windows-2022
+            binary: fomkeecli.exe
+            target: x86_64-pc-windows-msvc
+            asset: fomkeecli-Windows-x86_64.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy,rustfmt
+          targets: ${{ matrix.target }}
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test --locked
+      - run: cargo build --release --locked --target ${{ matrix.target }}
+      - name: Check release version
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_BINARY: target/${{ matrix.target }}/release/${{ matrix.binary }}
+        run: |
+          actual_version="$("$RELEASE_BINARY" --version)"
+          if [[ "$actual_version" != "fomkeecli ${RELEASE_TAG#v}" ]]; then
+            echo "Tag and binary version do not match." >&2
+            exit 1
+          fi
+      - name: Checksum binary (Unix)
+        if: runner.os != 'Windows'
+        env:
+          RELEASE_BINARY: target/${{ matrix.target }}/release/${{ matrix.binary }}
+          RELEASE_ASSET: ${{ matrix.asset }}
+        run: |
+          mkdir -p dist
+          cp "$RELEASE_BINARY" "dist/$RELEASE_ASSET"
+          cd dist
+          if command -v sha256sum >/dev/null; then
+            sha256sum "$RELEASE_ASSET" > "$RELEASE_ASSET.sha256"
+          else
+            shasum -a 256 "$RELEASE_ASSET" > "$RELEASE_ASSET.sha256"
+          fi
+      - name: Checksum binary (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          RELEASE_BINARY: target/${{ matrix.target }}/release/${{ matrix.binary }}
+          RELEASE_ASSET: ${{ matrix.asset }}
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item $env:RELEASE_BINARY "dist/$env:RELEASE_ASSET"
+          $hash = (Get-FileHash "dist/$env:RELEASE_ASSET" -Algorithm SHA256).Hash.ToLower()
+          "$hash  $env:RELEASE_ASSET" | Set-Content -Encoding ascii "dist/$env:RELEASE_ASSET.sha256"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-${{ matrix.asset }}
+          path: dist/*
+          if-no-files-found: error
+  package-skills:
+    needs: verify
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package skills and checksums
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          for skill in managing-fomkee-monitors writing-fomkee-check-functions; do
+            archive="${skill}-${RELEASE_TAG}.tar.gz"
+            tar --create --gzip --file "$archive" "skills/$skill"
+            sha256sum "$archive" > "${archive}.sha256"
+          done
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-agent-skills
+          if-no-files-found: error
+          path: |
+            managing-fomkee-monitors-${{ github.ref_name }}.tar.gz
+            managing-fomkee-monitors-${{ github.ref_name }}.tar.gz.sha256
+            writing-fomkee-check-functions-${{ github.ref_name }}.tar.gz
+            writing-fomkee-check-functions-${{ github.ref_name }}.tar.gz.sha256
+  release:
+    needs: [verify, package-skills]
+    if: github.repository == 'fomkee/cli' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: dist
+      - name: Verify release checksums
+        working-directory: dist
+        run: sha256sum --check --strict ./*.sha256
+      - name: Publish versioned release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          options=(--verify-tag --title "$RELEASE_TAG" --generate-notes)
+          if [[ "$RELEASE_TAG" == *-* ]]; then
+            options+=(--prerelease)
+          fi
+          gh release create "$RELEASE_TAG" dist/* "${options[@]}"

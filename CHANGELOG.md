@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.1.3
+
+- First downloadable release for Linux x86_64, macOS Apple Silicon and Intel,
+  and Windows x86_64, including both bundled agent skills.
+- Attached the full changelog, per-file SHA-256 checksums, and a combined
+  `SHA256SUMS` manifest to GitHub Releases. Release notes come from this changelog.
 
 - Fixed Windows file credentials to use the current user's ownership and
   protected permissions, accepting the auto-inherited descriptor flag only

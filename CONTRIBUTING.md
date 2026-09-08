@@ -54,6 +54,12 @@ Assets are `fomkeecli-Linux-x86_64`, `fomkeecli-Darwin-arm64`,
 are also attached as versioned archives with checksums. Keep README download
 commands aligned with these names.
 
+Promote the changelog's unreleased entry to `## VERSION` before tagging.
+The release body uses that entry; the full `CHANGELOG.md` and its checksum are
+also downloadable assets. `SHA256SUMS` combines all payload checksums. Publication
+fails if an expected binary, skill archive, checksum, or changelog entry is
+missing. Validate downloaded assets with `sha256sum --check SHA256SUMS`.
+
 Publishing waits for all builds and skill packaging, verifies checksums, and
 requires an existing tag. Prerelease tags remain prereleases. An existing
 release is not overwritten; inspect a failed publication before retrying.

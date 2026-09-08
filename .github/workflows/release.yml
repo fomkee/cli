@@ -119,6 +119,15 @@ jobs:
             managing-fomkee-monitors-${{ env.RELEASE_TAG }}.tar.gz.sha256
             writing-fomkee-check-functions-${{ env.RELEASE_TAG }}.tar.gz
             writing-fomkee-check-functions-${{ env.RELEASE_TAG }}.tar.gz.sha256
+      - name: Checksum changelog
+        run: sha256sum CHANGELOG.md > CHANGELOG.md.sha256
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-changelog
+          if-no-files-found: error
+          path: |
+            CHANGELOG.md
+            CHANGELOG.md.sha256
   release:
     needs: [verify, package-skills]
     if: github.repository == 'fomkee/cli' && (startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch')
@@ -131,15 +140,34 @@ jobs:
           pattern: release-*
           merge-multiple: true
           path: dist
-      - name: Verify release checksums
+      - name: Verify complete release assets and checksums
         working-directory: dist
-        run: sha256sum --check --strict ./*.sha256
+        run: |
+          for asset in fomkeecli-Linux-x86_64 fomkeecli-Darwin-arm64 \
+            fomkeecli-Darwin-x86_64 fomkeecli-Windows-x86_64.exe CHANGELOG.md \
+            "managing-fomkee-monitors-${RELEASE_TAG}.tar.gz" \
+            "writing-fomkee-check-functions-${RELEASE_TAG}.tar.gz"; do
+            if [[ ! -s "$asset" || ! -s "$asset.sha256" ]]; then
+              echo "Missing release asset or checksum: $asset" >&2
+              exit 1
+            fi
+          done
+          cat ./*.sha256 > SHA256SUMS
+          sha256sum --check --strict SHA256SUMS
+      - name: Prepare versioned release notes
+        run: |
+          awk -v heading="## ${RELEASE_TAG#v}" '
+            $0 == heading { found = 1; print; next }
+            found && /^## / { exit }
+            found { print }
+            END { if (!found) exit 1 }
+          ' dist/CHANGELOG.md > release-notes.md
       - name: Publish versioned release assets
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          options=(--verify-tag --title "$RELEASE_TAG" --generate-notes)
+          options=(--verify-tag --title "$RELEASE_TAG" --notes-file release-notes.md)
           if [[ "$RELEASE_TAG" == *-* ]]; then
             options+=(--prerelease)
           fi

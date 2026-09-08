@@ -9,6 +9,7 @@ pub fn accept(listener: &TcpListener) -> io::Result<TcpStream> {
     loop {
         match listener.accept() {
             Ok((stream, _)) => {
+                stream.set_nonblocking(false)?;
                 stream.set_read_timeout(Some(Duration::from_secs(5)))?;
                 stream.set_write_timeout(Some(Duration::from_secs(5)))?;
                 return Ok(stream);

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+- Pinned text checkouts to LF so Windows preserves snapshot and bundled-skill
+  bytes, and configured accepted test-server sockets explicitly on macOS.
+  Production behavior and existing test expectations remain unchanged.
+
 ## 0.1.1
 
 - Fixed the skill-export test's path expectation for macOS and symlinked

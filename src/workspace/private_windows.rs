@@ -57,3 +57,46 @@ pub(super) fn validate(file: &File) -> io::Result<()> {
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+
+    #[test]
+    fn test_new_private_file_has_the_expected_protected_descriptor() {
+        // Arrange
+        let directory = tempdir().unwrap();
+        let path = directory.path().join("private-file");
+
+        // Act
+        let result = super::super::open(&path, true);
+
+        // Assert
+        let file = File::open(path).unwrap();
+        assert_private_descriptor(&file, result);
+    }
+
+    fn assert_private_descriptor(file: &File, result: io::Result<File>) {
+        let actual = wrappers::GetSecurityInfo(
+            file,
+            SeObjectType::SE_FILE_OBJECT,
+            SecurityInformation::Dacl,
+        )
+        .unwrap();
+        let actual = wrappers::ConvertSecurityDescriptorToStringSecurityDescriptor(
+            &actual,
+            SecurityInformation::Dacl,
+        )
+        .unwrap();
+        let expected = wrappers::ConvertSecurityDescriptorToStringSecurityDescriptor(
+            &owner_descriptor(file).unwrap(),
+            SecurityInformation::Dacl,
+        )
+        .unwrap();
+        assert!(
+            result.is_ok(),
+            "{result:?}; actual={actual:?}; expected={expected:?}"
+        );
+    }
+}

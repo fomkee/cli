@@ -89,7 +89,7 @@ jobs:
           New-Item -ItemType Directory -Force dist | Out-Null
           Copy-Item $env:RELEASE_BINARY "dist/$env:RELEASE_ASSET"
           $hash = (Get-FileHash "dist/$env:RELEASE_ASSET" -Algorithm SHA256).Hash.ToLower()
-          "$hash  $env:RELEASE_ASSET" | Set-Content -Encoding ascii "dist/$env:RELEASE_ASSET.sha256"
+          "$hash  $env:RELEASE_ASSET`n" | Set-Content -NoNewline -Encoding ascii "dist/$env:RELEASE_ASSET.sha256"
       - uses: actions/upload-artifact@v7
         with:
           name: release-${{ matrix.asset }}
@@ -152,6 +152,7 @@ jobs:
               exit 1
             fi
           done
+          sed -i 's/\r$//' ./*.sha256
           cat ./*.sha256 > SHA256SUMS
           sha256sum --check --strict SHA256SUMS
       - name: Prepare versioned release notes

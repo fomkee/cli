@@ -24,8 +24,7 @@ pub(super) fn open(path: &Path, create: bool) -> io::Result<File> {
     configure(&mut options);
     #[cfg(windows)]
     if create {
-        use std::os::windows::fs::OpenOptionsExt;
-        options.access_mode(0xC0060000);
+        windows::request_protection_access(&mut options, true);
     }
     let mut file = options.open(path)?;
     if create {
@@ -40,9 +39,9 @@ pub(super) fn protect_temporary(temporary: &mut NamedTempFile) -> io::Result<()>
     protect(temporary.as_file_mut())?;
     #[cfg(windows)]
     {
-        use std::os::windows::fs::OpenOptionsExt;
         let mut options = OpenOptions::new();
-        options.read(true).access_mode(0x80060000);
+        options.read(true);
+        windows::request_protection_access(&mut options, false);
         configure(&mut options);
         let mut file = options.open(temporary.path())?;
         protect(&mut file)?;

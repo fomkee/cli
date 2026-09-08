@@ -43,6 +43,15 @@ read/write interoperability with an existing keyring must still be verified on
 each release platform; passing an in-memory test is not that verification.
 Protected TOML fallback, backend selection, and token secrecy remain unchanged.
 
+Windows file credentials explicitly assign ownership and the sole full-access
+entry to the current process user's SID, not the file's default owner (which
+can be the Administrators group). Validation requires that same owner and
+protected access list. It accepts either `P` or `PAI` DACL control flags with
+identical access entries: `AI` records automatic inheritance, while `P` retains
+protection. Additional entries, inherited entries, an unprotected list, and a
+different owner remain rejected. See Microsoft's
+[security descriptor format](https://learn.microsoft.com/en-us/windows/win32/secauthz/security-descriptor-string-format).
+
 ## Current transitive exception
 
 `generic-array 0.14.7` remains because the Linux Secret Service cryptography

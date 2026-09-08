@@ -1,0 +1,45 @@
+name: targeted-verification
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Platform to verify (one runner only)
+        type: choice
+        default: windows
+        options: [windows, linux, macos-arm64, macos-intel]
+      scope:
+        description: Checks to run (no release build or publication)
+        type: choice
+        default: credentials
+        options: [credentials, all]
+permissions:
+  contents: read
+concurrency:
+  group: verify-${{ github.ref }}-${{ inputs.platform || 'linux' }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    timeout-minutes: 15
+    runs-on: ${{ inputs.platform == 'windows' && 'windows-2022' || inputs.platform == 'macos-arm64' && 'macos-15' || inputs.platform == 'macos-intel' && 'macos-15-intel' || 'ubuntu-22.04' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy,rustfmt
+      - run: cargo fmt --check
+      - name: Check credential targets
+        if: inputs.scope == 'credentials'
+        run: cargo clippy --locked --lib --bin fomkeecli --test credential_storage --test connect_concurrency --test workspace_http -- -D warnings
+      - name: Test Windows descriptor protections
+        if: inputs.scope == 'credentials' && runner.os == 'Windows'
+        run: cargo test --locked --lib workspace::private_files::windows::tests
+      - name: Test credential storage and workspace connections
+        if: inputs.scope == 'credentials'
+        run: cargo test --locked --test credential_storage --test connect_concurrency --test workspace_http --no-fail-fast
+      - name: Check all targets
+        if: inputs.scope != 'credentials'
+        run: cargo clippy --locked --all-targets -- -D warnings
+      - name: Test all targets
+        if: inputs.scope != 'credentials'
+        run: cargo test --locked --no-fail-fast

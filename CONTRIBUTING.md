@@ -27,6 +27,17 @@ Run `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, and
 into the private canonical subtree by maintainers; never add private repository
 credentials to public workflows.
 
+## CI budget
+
+Run local checks first. Pull requests use one Linux runner; ordinary branch
+pushes do not start CI. For a platform-specific fix, manually dispatch
+`targeted-verification` on the relevant ref and select one platform and either
+`credentials` or `all`. It never builds release binaries or publishes assets.
+Rerun failed jobs for unchanged code instead of restarting a completed matrix.
+Do not create version tags while diagnosing failures. Obtain maintainer approval
+before running the full release matrix; results from older source revisions are
+useful evidence, not release verification for changed code.
+
 ## Releases
 
 In `fomkee/cli`, a pushed `vVERSION` tag runs the native build/test matrix and

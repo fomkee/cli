@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Fixed Windows file credentials to use the current user's ownership and
+  protected permissions, accepting the auto-inherited descriptor flag only
+  when the protected access rules still match exactly.
+- Added single-platform, scoped CI verification; normal pushes no longer
+  start the full release matrix.
+
 ## 0.1.2
 
 - Pinned text checkouts to LF so Windows preserves snapshot and bundled-skill

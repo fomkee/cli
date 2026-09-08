@@ -33,6 +33,10 @@ In `fomkee/cli`, a pushed `vVERSION` tag runs the native build/test matrix and
 must match `fomkeecli --version`. Only that repository publishes release assets;
 pull requests and forks cannot publish through this workflow.
 
+If a tag push does not start a run, manually run `verify-and-release` from
+`main` with the existing version tag as its `tag` input. This builds that tag
+through the same checks without moving it or replacing an existing release.
+
 Assets are `fomkeecli-Linux-x86_64`, `fomkeecli-Darwin-arm64`,
 `fomkeecli-Darwin-x86_64`, and `fomkeecli-Windows-x86_64.exe`, each with a
 `.sha256` file. Linux uses the Ubuntu 22.04 glibc baseline. Both bundled skills

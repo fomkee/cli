@@ -3,11 +3,19 @@ on:
   push:
     tags: ['v*']
   pull_request:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to build and release
+        required: true
+        type: string
 permissions:
   contents: read
 concurrency:
-  group: cli-${{ github.workflow }}-${{ github.ref }}
+  group: cli-${{ github.workflow }}-${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
   cancel-in-progress: false
+env:
+  RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
 jobs:
   verify:
     strategy:
@@ -32,6 +40,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy,rustfmt
@@ -41,12 +51,15 @@ jobs:
       - run: cargo test --locked
       - run: cargo build --release --locked --target ${{ matrix.target }}
       - name: Check release version
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
         shell: bash
         env:
-          RELEASE_TAG: ${{ github.ref_name }}
           RELEASE_BINARY: target/${{ matrix.target }}/release/${{ matrix.binary }}
         run: |
+          if [[ "$RELEASE_TAG" != v* ]]; then
+            echo "Release tag must start with v." >&2
+            exit 1
+          fi
           actual_version="$("$RELEASE_BINARY" --version)"
           if [[ "$actual_version" != "fomkeecli ${RELEASE_TAG#v}" ]]; then
             echo "Tag and binary version do not match." >&2
@@ -84,13 +97,13 @@ jobs:
           if-no-files-found: error
   package-skills:
     needs: verify
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
       - name: Package skills and checksums
-        env:
-          RELEASE_TAG: ${{ github.ref_name }}
         run: |
           for skill in managing-fomkee-monitors writing-fomkee-check-functions; do
             archive="${skill}-${RELEASE_TAG}.tar.gz"
@@ -102,13 +115,13 @@ jobs:
           name: release-agent-skills
           if-no-files-found: error
           path: |
-            managing-fomkee-monitors-${{ github.ref_name }}.tar.gz
-            managing-fomkee-monitors-${{ github.ref_name }}.tar.gz.sha256
-            writing-fomkee-check-functions-${{ github.ref_name }}.tar.gz
-            writing-fomkee-check-functions-${{ github.ref_name }}.tar.gz.sha256
+            managing-fomkee-monitors-${{ env.RELEASE_TAG }}.tar.gz
+            managing-fomkee-monitors-${{ env.RELEASE_TAG }}.tar.gz.sha256
+            writing-fomkee-check-functions-${{ env.RELEASE_TAG }}.tar.gz
+            writing-fomkee-check-functions-${{ env.RELEASE_TAG }}.tar.gz.sha256
   release:
     needs: [verify, package-skills]
-    if: github.repository == 'fomkee/cli' && startsWith(github.ref, 'refs/tags/v')
+    if: github.repository == 'fomkee/cli' && (startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-22.04
     permissions:
       contents: write
@@ -125,7 +138,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          RELEASE_TAG: ${{ github.ref_name }}
         run: |
           options=(--verify-tag --title "$RELEASE_TAG" --generate-notes)
           if [[ "$RELEASE_TAG" == *-* ]]; then

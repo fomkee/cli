@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1
+
+- Fixed the skill-export test's path expectation for macOS and symlinked
+  working directories; exported paths must be absolute and identify the same
+  destination. Runtime behavior and zero-panic checks are unchanged.
+- Added manual release builds for existing tags without moving them.
+
 ## 0.1.0
 
 - Added offline `skill export DIRECTORY`: exports both bundled skill folders

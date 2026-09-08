@@ -7,7 +7,8 @@ use std::fs;
 
 use serde_json::Value;
 use support::{
-    Fixture, assert_manifest_matches_export, assert_matches_sources, failure, files, stdout,
+    Fixture, assert_absolute_manifest_matches_export, assert_manifest_matches_export,
+    assert_matches_sources, failure, files, stdout,
 };
 
 #[test]
@@ -81,7 +82,7 @@ fn test_relative_destination_is_reported_as_an_absolute_path() {
         );
 
     // Assert
-    assert_manifest_matches_export(&output, &fixture.destination());
+    assert_absolute_manifest_matches_export(&output, &fixture.destination());
 }
 
 #[test]
@@ -233,6 +234,25 @@ fn test_completion_discovers_the_skill_export_command() {
 mod unix {
     use super::*;
     use std::os::unix::fs::symlink;
+
+    #[test]
+    fn test_relative_export_from_symlinked_working_directory_reports_actual_destination() {
+        // Arrange
+        let fixture = Fixture::new();
+        let working_directory = fixture.root.path().join("working-directory");
+        symlink(fixture.root.path(), &working_directory).unwrap();
+
+        // Act
+        let output = stdout(fixture.command().current_dir(&working_directory).args([
+            "skill",
+            "export",
+            "review skills",
+            "--json",
+        ]));
+
+        // Assert
+        assert_absolute_manifest_matches_export(&output, &fixture.destination());
+    }
 
     #[test]
     fn test_destination_symlink_is_rejected_without_writing_its_target() {

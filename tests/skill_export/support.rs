@@ -115,3 +115,14 @@ pub(super) fn assert_manifest_matches_export(output: &str, directory: &Path) {
         .collect();
     assert_eq!(exported, files(directory));
 }
+
+pub(super) fn assert_absolute_manifest_matches_export(output: &str, directory: &Path) {
+    let value: Value = serde_json::from_str(output).unwrap();
+    let reported = Path::new(value.get("directory").unwrap().as_str().unwrap());
+    assert!(reported.is_absolute());
+    assert_eq!(
+        reported.canonicalize().unwrap(),
+        directory.canonicalize().unwrap()
+    );
+    assert_manifest_matches_export(output, reported);
+}

@@ -1,5 +1,6 @@
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::todo)]
 
+pub mod alerting;
 pub mod client;
 mod commands;
 pub mod config;
@@ -12,6 +13,7 @@ pub mod monitoring;
 mod output;
 mod result;
 mod skill;
+pub mod update;
 pub mod wire;
 pub mod workspace;
 
@@ -57,11 +59,29 @@ pub async fn run_process() -> ExitCode {
             }
         };
     }
+    let update_directory = (!cli.no_update_check
+        && matches!(output_mode, OutputMode::Human)
+        && io::stdout().is_terminal()
+        && io::stderr().is_terminal()
+        && matches!(
+            cli.command,
+            Command::Monitor { .. }
+                | Command::Destination { .. }
+                | Command::Entitlement { .. }
+                | Command::Auth { .. }
+        ))
+    .then(|| config_directory(cli.config_dir.as_deref()).ok())
+    .flatten();
     match execute(cli, &mut presentation)
         .await
         .and_then(|value| Output::write(value, &presentation))
     {
-        Ok(()) => ExitCode::SUCCESS,
+        Ok(()) => {
+            if let Some(directory) = update_directory {
+                update::notify(&directory).await;
+            }
+            ExitCode::SUCCESS
+        }
         Err(error) => {
             Output::write_error(&error, output_mode, presentation.color);
             ExitCode::from(error.exit_code())
@@ -160,6 +180,9 @@ fn print_argument_message(error: &clap::Error, color: ColorMode) -> Result<(), C
 }
 
 async fn execute(cli: Cli, presentation: &mut Presentation) -> Result<CommandResult, CliError> {
+    if let Command::SelfUpdate { check } = cli.command {
+        return update::command(check).await.map(CommandResult::SelfUpdate);
+    }
     if let Command::Skill {
         command: SkillCommand::Export { directory },
     } = cli.command
@@ -200,6 +223,7 @@ async fn execute(cli: Cli, presentation: &mut Presentation) -> Result<CommandRes
             .entitlements(&workspace)
             .await
             .map(CommandResult::Entitlement),
+        Command::Destination { command } => alerting::execute(&api, &workspace, command).await,
         Command::Monitor { command } => {
             monitor_command(
                 &api,
@@ -216,6 +240,9 @@ async fn execute(cli: Cli, presentation: &mut Presentation) -> Result<CommandRes
         Command::Skill {
             command: SkillCommand::Export { directory },
         } => skill::export(&skill::FileSkillExporter, &directory).map(CommandResult::SkillExport),
+        Command::SelfUpdate { check } => {
+            update::command(check).await.map(CommandResult::SelfUpdate)
+        }
         Command::Completion { .. } => Err(CliError::InvalidInput(
             "completion must be handled locally".into(),
         )),

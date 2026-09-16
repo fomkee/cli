@@ -31,25 +31,32 @@ use store::FileWorkspaceStore;
 /// Commands for local workspace connections, without remote workspace mutations.
 #[derive(Debug, Subcommand)]
 pub(crate) enum WorkspaceCommand {
-    /// Validate and save a workspace API key (keyring preferred, protected file fallback).
+    /// Connect a workspace using an API token.
     Connect {
+        /// Name to save this connection under.
         alias: WorkspaceAlias,
         /// Read the token from stdin instead of a hidden terminal prompt.
         #[arg(long)]
         token_stdin: bool,
-        /// API origin for this connection; saved with the token.
+        /// Fomkee server address for this workspace.
         #[arg(long, env = "FOMKEE_API_URL", default_value = DEFAULT_API_URL)]
         api_url: String,
-        /// auto prefers the keyring and falls back to an unencrypted, owner-only TOML file.
+        /// Where to save the token; auto prefers the keyring, with a local file fallback.
         #[arg(long, value_enum, default_value = "auto")]
         credential_store: CredentialPreference,
     },
-    /// List locally connected workspaces (does not query account memberships).
+    /// List your saved workspace connections.
     List,
     /// Select the default workspace.
-    Use { alias: WorkspaceAlias },
-    /// Remove the local connection and saved token; the remote key stays valid.
-    Disconnect { alias: WorkspaceAlias },
+    Use {
+        /// Saved workspace alias shown by workspace list.
+        alias: WorkspaceAlias,
+    },
+    /// Forget a saved connection; its API token remains valid.
+    Disconnect {
+        /// Saved workspace alias shown by workspace list.
+        alias: WorkspaceAlias,
+    },
 }
 
 /// Execute a local workspace operation.

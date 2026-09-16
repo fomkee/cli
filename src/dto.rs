@@ -234,3 +234,7 @@ pub struct MonitoringLimits {
     #[serde(flatten)]
     pub other: BTreeMap<String, Value>,
 }
+
+pub mod update;
+
+pub mod alerting;

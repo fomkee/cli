@@ -80,3 +80,41 @@ Start with `fomkeecli --help`, or explore the
 
 Found a rough edge or have an idea? Open an issue. If you'd like to help with
 the code, see [Contributing](CONTRIBUTING.md).
+
+## Update monitors and manage alerts
+
+```bash
+fomkeecli monitor update MONITOR_ID --name 'API health' --interval 5m
+fomkeecli destination create --file destination.json
+fomkeecli destination list
+fomkeecli destination assign DESTINATION_ID MONITOR_ID
+fomkeecli destination test DESTINATION_ID
+fomkeecli destination monitors DESTINATION_ID
+```
+
+See the [management guide](docs/MANAGEMENT.md) for destination JSON examples,
+updates, credential preservation, pagination, and removing assignments.
+
+## Keep fomkeecli up to date
+
+```bash
+fomkeecli self-update --check
+fomkeecli self-update
+```
+
+GitHub Releases in `fomkee/cli` is the source for stable updates. Interactive
+API commands check at most once daily using a local cache and print an available
+version to stderr. Checks have a two-second budget and failures do not affect
+your command. JSON, redirected output, help, completion, configuration inspection,
+and skill export do not trigger automatic checks.
+
+Disable notifications with `--no-update-check` or `FOMKEE_NO_UPDATE_CHECK=1`.
+`self-update --check` always performs an explicit check; neither update command
+needs workspace credentials. Nothing is installed automatically.
+
+Self-update downloads the matching Linux x86_64, macOS arm64/Intel, or Windows
+x86_64 release binary, verifies its size and SHA-256 checksum, then replaces the
+executable while preserving permissions. It never downgrades, installs a
+prerelease, or falls back to an unchecked download. The installation directory
+must be writable; there is no automatic privilege escalation. The next invocation
+uses the new version. Other platforms must build from source.

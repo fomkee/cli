@@ -1,3 +1,4 @@
+use crate::dto::update::UpdateInput;
 use std::time::Duration;
 
 use crate::dto::dry_run::DryRun;
@@ -194,19 +195,7 @@ impl FomkeeApi for HttpFomkeeApi {
         limit: u32,
         after: Option<&str>,
     ) -> Result<Response<MonitorPage>, CliError> {
-        if !(1..=PAGE_SIZE).contains(&limit) {
-            return Err(CliError::InvalidInput(format!(
-                "--limit must be between 1 and {PAGE_SIZE}"
-            )));
-        }
-        let query = {
-            let mut serializer = form_urlencoded::Serializer::new(String::new());
-            serializer.append_pair("limit", &limit.to_string());
-            if let Some(cursor) = after {
-                serializer.append_pair("after", cursor);
-            }
-            serializer.finish()
-        };
+        let query = page_query(limit, after)?;
         self.read_request(&format!("api/workspaces/{workspace}/monitors?{query}"))
             .await
     }
@@ -239,6 +228,20 @@ impl FomkeeApi for HttpFomkeeApi {
         self.request(
             Method::POST,
             &format!("api/workspaces/{workspace}/monitors"),
+            Some(serialize_body(&input)?),
+            true,
+        )
+        .await
+    }
+    async fn update_monitor(
+        &self,
+        workspace: &WorkspaceId,
+        monitor: &MonitorId,
+        input: UpdateInput,
+    ) -> Result<Response<Monitor>, CliError> {
+        self.request(
+            Method::PUT,
+            &format!("api/workspaces/{workspace}/monitors/{monitor}"),
             Some(serialize_body(&input)?),
             true,
         )
@@ -283,4 +286,20 @@ impl FomkeeApi for HttpFomkeeApi {
 fn serialize_body(value: &impl Serialize) -> Result<Value, CliError> {
     serde_json::to_value(value)
         .map_err(|_| CliError::InvalidInput("cannot serialize API request".into()))
+}
+
+mod alerting;
+
+fn page_query(limit: u32, after: Option<&str>) -> Result<String, CliError> {
+    if !(1..=PAGE_SIZE).contains(&limit) {
+        return Err(CliError::InvalidInput(format!(
+            "--limit must be between 1 and {PAGE_SIZE}"
+        )));
+    }
+    let mut query = form_urlencoded::Serializer::new(String::new());
+    query.append_pair("limit", &limit.to_string());
+    if let Some(after) = after {
+        query.append_pair("after", after);
+    }
+    Ok(query.finish())
 }

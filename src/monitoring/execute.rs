@@ -1,4 +1,5 @@
 use super::{CreateCommand, DryRunInput, LifecycleInput, read_json_input};
+use crate::alerting::AssignmentScope;
 use crate::client::FomkeeApi;
 use crate::commands::MonitorCommand;
 use crate::error::CliError;
@@ -13,6 +14,37 @@ pub(crate) async fn monitor_command(
     output: OutputMode,
 ) -> Result<CommandResult, CliError> {
     match command {
+        MonitorCommand::Destinations {
+            monitor_id,
+            limit,
+            after,
+        } => api
+            .list_assignments(
+                &workspace,
+                AssignmentScope::Monitor(monitor_id),
+                limit,
+                after.as_deref(),
+            )
+            .await
+            .map(CommandResult::Assignments),
+        MonitorCommand::Assign {
+            monitor_id,
+            destination_id,
+        } => api
+            .assign_destination(&workspace, &monitor_id, &destination_id)
+            .await
+            .map(CommandResult::Assigned),
+        MonitorCommand::Update {
+            monitor_id,
+            changes,
+        } => super::update::execute(api, &workspace, &monitor_id, *changes)
+            .await
+            .map(|result| {
+                CommandResult::MonitorAction(ActionResult {
+                    action: MonitorAction::Updated,
+                    result,
+                })
+            }),
         MonitorCommand::List { limit, after } => api
             .list_monitors(&workspace, limit, after.as_deref())
             .await

@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.0
+
+- Added monitor updates with focused flags, secret-preserving replacement, and
+  complete JSON input for advanced settings.
+- Added destination creation, listing, inspection, updates, real delivery tests,
+  and monitor assignment management in both directions.
+- Added cached GitHub version notifications and explicit checksum-verified
+  `self-update` / `self-update --check` commands independent of workspace auth.
+
+- Added concise help for every command and option, and updated the bundled AI
+  skills for monitor updates and destination management.
+- Kept development builds ahead of older stable releases to prevent self-update
+  from replacing them with an older feature set.
+
 ## 0.1.3
 
 - First downloadable release for Linux x86_64, macOS Apple Silicon and Intel,

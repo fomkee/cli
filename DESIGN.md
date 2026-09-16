@@ -7,6 +7,9 @@ document, representative examples, and output regression tests together.
 ## Command language and API boundary
 
 - The executable is `fomkeecli`. Use singular nouns and consistent verbs.
+- Every command and option has concise help describing its purpose to a person.
+  Lead with an action, explain unfamiliar inputs with short examples, and leave
+  implementation details in contributor documentation.
 - Common operations need one invocation, not a wizard. Keep
   `monitor create http|function|heartbeat` and shell completion discoverable.
 - The API owns validation, entitlements, defaults, and lifecycle policy.
@@ -181,3 +184,25 @@ Cover representative output with checked-in snapshots and behavioral tests:
 40/80/120-column layouts, Unicode names, long values, empty lists, pagination,
 color on/off, pipe behavior, details, JSON invariance, malicious terminal text,
 and one-time secrets. Tests must be deterministic and offline.
+
+## Updates and alert destinations
+
+- `monitor update ID` accepts focused flags and preserves the rest of the fetched
+  editable representation, including write-only auth through explicit preservation.
+  `--file` instead supplies a full replacement; never merge flags or defaults into it.
+  Missing required detail fields fail before the write. The PUT API remains
+  last-write-wins, so document concurrent-edit limits.
+- `destination` manages the API's supported alert targets. Credential-bearing
+  creation and replacement input comes from files/stdin. Human details hide URLs
+  and credentials; JSON preserves the original safe API result and extensions.
+- Assignment lists display copyable monitor, destination, and assignment IDs.
+  Both directions paginate explicitly. Test output names the actual provider
+  outcome; HTTP success does not imply successful notification delivery.
+- `self-update --check` and `self-update` are local commands independent of Fomkee
+  authentication. GitHub stable releases are authoritative. Installation requires
+  matching asset identity, size, and SHA-256 checksum, with no downgrade or fallback.
+- Optional version discovery is a deliberate network capability, separate from
+  presentation rendering. Only successful interactive API commands trigger it;
+  cache attempts for a day, bound notification latency to two seconds, print to
+  stderr, and allow `--no-update-check` / `FOMKEE_NO_UPDATE_CHECK=1`. Preserve command
+  success when optional discovery fails. JSON and offline commands never trigger it.

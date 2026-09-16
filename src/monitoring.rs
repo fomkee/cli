@@ -12,8 +12,11 @@ use std::io::{self, Read};
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum CreateCommand {
+    /// Check a website or HTTP endpoint.
     Http(HttpCreateArgs),
+    /// Check an HTTP response with your JavaScript.
     Function(FunctionCreateArgs),
+    /// Watch for regular pings from a job or service.
     Heartbeat(HeartbeatCreateArgs),
 }
 
@@ -22,11 +25,13 @@ pub(crate) struct CommonCreateArgs {
     /// Display name; defaults to hostname/path for HTTP and Function monitors.
     #[arg(long, conflicts_with = "file")]
     name: Option<String>,
+    /// Short description of what this monitor checks.
     #[arg(long, conflicts_with = "file")]
     description: Option<String>,
+    /// Tags for organizing monitors, separated by commas.
     #[arg(long, value_delimiter = ',', conflicts_with = "file")]
     tags: Vec<String>,
-    /// Complete public API request JSON; use - for standard input.
+    /// JSON settings file; use - for standard input.
     #[arg(long, value_hint = ValueHint::FilePath)]
     file: Option<String>,
 }
@@ -35,13 +40,13 @@ pub(crate) struct CommonCreateArgs {
 pub(crate) struct HttpCreateArgs {
     #[command(flatten)]
     common: CommonCreateArgs,
-    /// Target URL. Supply --file instead for a complete API request.
+    /// Website or endpoint URL to check.
     #[arg(required_unless_present = "file", conflicts_with = "file", value_hint = ValueHint::Url)]
     url: Option<String>,
-    /// Check interval, e.g. 30s or 5m. Defaults to the API's workspace minimum.
+    /// Time between checks, e.g. 30s or 5m; defaults to your plan minimum.
     #[arg(long = "interval", value_name = "DURATION", value_parser = duration::seconds, conflicts_with = "file")]
     interval_secs: Option<u64>,
-    /// HTTP method; omitted by default so the API chooses.
+    /// HTTP method to use, e.g. GET or POST.
     #[arg(long, conflicts_with = "file")]
     method: Option<String>,
 }
@@ -50,9 +55,10 @@ pub(crate) struct HttpCreateArgs {
 pub(crate) struct FunctionCreateArgs {
     #[command(flatten)]
     common: CommonCreateArgs,
+    /// Website or endpoint URL to check.
     #[arg(required_unless_present = "file", conflicts_with = "file", value_hint = ValueHint::Url)]
     url: Option<String>,
-    /// Check interval, e.g. 30s or 5m. Defaults to the API's workspace minimum.
+    /// Time between checks, e.g. 30s or 5m; defaults to your plan minimum.
     #[arg(long = "interval", value_name = "DURATION", value_parser = duration::seconds, conflicts_with = "file")]
     interval_secs: Option<u64>,
     /// JavaScript source file; use - for standard input.
@@ -64,14 +70,16 @@ pub(crate) struct FunctionCreateArgs {
 pub(crate) struct HeartbeatCreateArgs {
     #[command(flatten)]
     common: CommonCreateArgs,
-    /// Expected heartbeat period, e.g. 24h; required unless --cron or --file is supplied.
+    /// Expected time between pings, e.g. 1h or 24h.
     #[arg(long = "every", value_name = "DURATION", value_parser = duration::seconds, conflicts_with_all = ["cron_expression", "file"], required_unless_present_any = ["cron_expression", "file"])]
     period_secs: Option<u64>,
+    /// Expected ping schedule, e.g. "0 * * * *".
     #[arg(long = "cron", conflicts_with_all = ["period_secs", "file"])]
     cron_expression: Option<String>,
+    /// Extra time to allow a late ping, e.g. 5m.
     #[arg(long = "grace", value_name = "DURATION", value_parser = duration::seconds, conflicts_with = "file")]
     grace_secs: Option<u64>,
-    /// Optional heartbeat body-validation JavaScript source file.
+    /// JavaScript file to validate each ping's body.
     #[arg(long = "script", value_name = "FILE", conflicts_with = "file", value_hint = ValueHint::FilePath)]
     js_source_file: Option<String>,
 }
@@ -211,3 +219,5 @@ pub(crate) fn read_json_input(path: &str) -> Result<Value, CliError> {
 
 #[cfg(test)]
 mod tests;
+
+pub(crate) mod update;

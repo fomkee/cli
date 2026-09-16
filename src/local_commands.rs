@@ -17,9 +17,9 @@ use crate::workspace::store::{config_directory, read_registry};
 /// Local, non-secret configuration diagnostics.
 #[derive(Debug, Subcommand)]
 pub(crate) enum ConfigCommand {
-    /// Show resolved file locations, even before configuration exists.
+    /// Show where your CLI settings and credentials are stored.
     Paths,
-    /// Show the effective connection without reading tokens or contacting the API.
+    /// Show your selected workspace and connection settings.
     Show,
 }
 

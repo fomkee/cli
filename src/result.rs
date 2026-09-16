@@ -1,3 +1,6 @@
+use crate::alerting::RemovedAssignment;
+use crate::dto::alerting::{Assignment, Destination, DestinationTest, Page};
+use crate::update::UpdateResult;
 use serde::Serialize;
 
 use crate::dto::dry_run::DryRun;
@@ -12,6 +15,7 @@ use crate::workspace::output::{
 #[derive(Clone, Copy)]
 pub(crate) enum MonitorAction {
     Created,
+    Updated,
     Paused,
     Resumed,
     Disabled,
@@ -22,6 +26,7 @@ impl MonitorAction {
     pub(crate) fn label(self) -> &'static str {
         match self {
             Self::Created => "Created",
+            Self::Updated => "Updated",
             Self::Paused => "Paused",
             Self::Resumed => "Resumed",
             Self::Disabled => "Disabled",
@@ -63,6 +68,15 @@ pub(crate) struct DeletedMonitor {
 #[derive(Serialize)]
 #[serde(untagged)]
 pub(crate) enum CommandResult {
+    SelfUpdate(UpdateResult),
+    DestinationList(Response<Page<Destination>>),
+    Destination(Response<Destination>),
+    DestinationCreated(Response<Destination>),
+    DestinationUpdated(Response<Destination>),
+    DestinationTest(Response<DestinationTest>),
+    Assignments(Response<Page<Assignment>>),
+    Assigned(Response<Assignment>),
+    Unassigned(RemovedAssignment),
     MonitorList(Response<MonitorPage>),
     MonitorGet(Response<Monitor>),
     Created(Response<CreatedMonitor>),

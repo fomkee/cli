@@ -1,4 +1,5 @@
 use crate::dto::dry_run::DryRun;
+use crate::dto::update::UpdateInput;
 use crate::dto::{CreatedMonitor, Entitlements, Monitor, MonitorPage, Session, Workspace};
 use crate::error::CliError;
 use crate::model::{MonitorId, WorkspaceId};
@@ -6,6 +7,8 @@ use crate::monitoring::{CreateInput, DryRunInput, LifecycleInput};
 use crate::wire::Response;
 use async_trait::async_trait;
 
+mod alerting;
+pub use alerting::AlertingApi;
 mod http;
 mod memory;
 pub use http::HttpFomkeeApi;
@@ -13,7 +16,7 @@ pub use memory::InMemoryFomkeeApi;
 
 /// Public HTTP API port; success always carries the validated endpoint representation.
 #[async_trait]
-pub trait FomkeeApi: Send + Sync {
+pub trait FomkeeApi: AlertingApi + Send + Sync {
     /// Resolve the token's current workspace identity.
     async fn session(&self) -> Result<Response<Session>, CliError>;
     /// Fetch public metadata for the authenticated workspace.
@@ -48,6 +51,13 @@ pub trait FomkeeApi: Send + Sync {
         workspace: &WorkspaceId,
         input: CreateInput,
     ) -> Result<Response<CreatedMonitor>, CliError>;
+    /// Replace the editable monitor representation once.
+    async fn update_monitor(
+        &self,
+        workspace: &WorkspaceId,
+        monitor: &MonitorId,
+        input: UpdateInput,
+    ) -> Result<Response<Monitor>, CliError>;
     /// Apply one lifecycle operation and return the resulting monitor.
     async fn lifecycle(
         &self,

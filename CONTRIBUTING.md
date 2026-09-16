@@ -40,6 +40,13 @@ useful evidence, not release verification for changed code.
 
 ## Releases
 
+Keep unreleased feature builds on a development version above existing stable
+releases (for example, `0.3.0-dev.1` after `0.2.0`). Otherwise self-update can replace
+a source installation with an older feature set bearing a newer version number.
+Before publishing, set the intended stable version and move the Unreleased
+changelog entries into it. Version notifications compare the embedded Cargo
+version with GitHub.
+
 In `fomkee/cli`, a pushed `vVERSION` tag runs the native build/test matrix and
 must match `fomkeecli --version`. Only that repository publishes release assets;
 pull requests and forks cannot publish through this workflow.

@@ -61,3 +61,17 @@ not remove this upstream constraint. Revisit when that dependency chain updates;
 do not add a direct dependency or patch cryptography code to override it.
 
 Inspect the source with `cargo tree -i generic-array@0.14.7` from this workspace.
+
+## Release updater
+
+- [semver 1](https://docs.rs/semver/latest/semver/struct.Version.html) parses
+  release versions and compares precedence without treating build metadata as an upgrade.
+- [sha2 0.11.0](https://docs.rs/sha2/0.11.0/sha2/) verifies published SHA-256 files.
+  Its digest output is encoded byte-by-byte; it no longer implements `LowerHex`.
+- [self-replace 1.5.0](https://docs.rs/self-replace/1.5.0/self_replace/) implements
+  Unix replacement and Windows replacement/cleanup of a running executable,
+  preserving the original permissions. Release discovery, repository/asset
+  validation, checksum verification, timeouts, and notifications remain CLI-owned.
+  Native Windows/macOS behavior must run in the existing release matrix.
+- Discovery uses GitHub's [latest stable release endpoint](https://docs.github.com/en/rest/releases/releases#get-the-latest-release)
+  and an anonymous client separate from the authenticated Fomkee client.

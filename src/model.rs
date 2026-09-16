@@ -31,6 +31,8 @@ macro_rules! identifier {
 
 identifier!(WorkspaceId, "workspace ID");
 identifier!(MonitorId, "monitor ID");
+identifier!(DestinationId, "destination ID");
+identifier!(AssignmentId, "assignment ID");
 
 #[cfg(test)]
 mod tests {

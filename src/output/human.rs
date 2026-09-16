@@ -2,7 +2,7 @@ use super::context::DisplayContext;
 use super::format::text;
 use super::layout::Ui;
 use super::theme::Verdict;
-use super::{connection, dry_run, monitor, skill};
+use super::{alerting, connection, dry_run, monitor, skill};
 use crate::error::CliError;
 use crate::error::response::ResponseOutcome;
 use crate::result::CommandResult;
@@ -16,6 +16,64 @@ pub(super) fn render(
 ) -> String {
     let mut ui = Ui::new(width, color);
     match result {
+        CommandResult::SelfUpdate(value) => {
+            ui.title(if value.updated {
+                "Updated fomkeecli"
+            } else {
+                "fomkeecli version check"
+            });
+            ui.fields(vec![
+                ("Previously installed".into(), text(&value.current_version)),
+                ("Latest stable".into(), text(&value.latest_version)),
+            ]);
+            if value.updated {
+                ui.line("The next invocation uses the new version.");
+            } else if value.update_available {
+                ui.hint("Run fomkeecli self-update to install this release.");
+            } else {
+                ui.line("No newer stable release is available.");
+            }
+            ui.finish()
+        }
+
+        CommandResult::DestinationList(value) => {
+            alerting::list(&mut ui, value.data(), details);
+            ui.finish()
+        }
+        CommandResult::Destination(value) => {
+            alerting::destination(&mut ui, value.data(), "Alert destination", details);
+            ui.finish()
+        }
+        CommandResult::DestinationCreated(value) => {
+            alerting::destination(&mut ui, value.data(), "Created alert destination", details);
+            ui.finish()
+        }
+        CommandResult::DestinationUpdated(value) => {
+            alerting::destination(&mut ui, value.data(), "Updated alert destination", details);
+            ui.finish()
+        }
+        CommandResult::DestinationTest(value) => {
+            alerting::test(&mut ui, value.data());
+            ui.finish()
+        }
+        CommandResult::Assignments(value) => {
+            alerting::assignments(&mut ui, value.data());
+            ui.finish()
+        }
+        CommandResult::Assigned(value) => {
+            ui.title("Assigned alert destination");
+            alerting::assignment(&mut ui, value.data());
+            ui.finish()
+        }
+        CommandResult::Unassigned(value) => {
+            ui.title("Removed alert assignment");
+            ui.fields(vec![(
+                "Assignment ID".into(),
+                value.assignment_id.to_string(),
+            )]);
+            ui.finish()
+        }
+
         CommandResult::MonitorGet(value) => {
             ui.page_width();
             monitor::detail(&mut ui, value.data(), details, context);
@@ -105,17 +163,17 @@ pub(super) fn error(error: &CliError, width: u16, color: bool) -> String {
         CliError::Configuration(_) => {
             Some("Run fomkeecli config paths to locate the configuration.")
         }
-        CliError::OutcomeUnknown(_) => {
-            Some("Run fomkeecli monitor list and inspect the target before retrying.")
-        }
+        CliError::OutcomeUnknown(_) => Some(
+            "Inspect current state with fomkeecli monitor list or fomkeecli destination list before retrying.",
+        ),
         CliError::Api {
             status: 401 | 403, ..
         } => Some("Check the selected workspace and token access with fomkeecli auth status."),
         CliError::Response(error) => match error.outcome {
             ResponseOutcome::Read => None,
-            ResponseOutcome::MutationAcknowledged | ResponseOutcome::MutationErrorReported => {
-                Some("Run fomkeecli monitor list and inspect the target before retrying.")
-            }
+            ResponseOutcome::MutationAcknowledged | ResponseOutcome::MutationErrorReported => Some(
+                "Inspect current state with fomkeecli monitor list or fomkeecli destination list before retrying.",
+            ),
         },
         CliError::CredentialStore
         | CliError::MissingSavedCredential

@@ -1,6 +1,6 @@
 ---
 name: managing-fomkee-monitors
-description: Manage Fomkee HTTP, Function, and Heartbeat monitors through fomkeecli with explicit JSON output. Use for supported monitor inspection, dry-runs, creation, lifecycle changes, and confirmed deletion; do not use for invitations, monitor replacement, or MCP.
+description: Manage Fomkee HTTP, Function, and Heartbeat monitors through fomkeecli with explicit JSON output. Use for monitor inspection, creation, updates, lifecycle changes, alert destinations and assignments; do not use for invitations or MCP.
 ---
 
 # Manage Fomkee monitors
@@ -49,3 +49,16 @@ general request to clean up.
 Read [authentication](references/authentication.md) for credential handling,
 [monitor types](references/monitor-types.md) for required input shape, and
 [safety](references/safety.md) for destructive and uncertain outcomes.
+
+
+For monitor updates and destination management, read the
+[update and destination guidance](references/monitor-types.md#updates-and-alert-destinations).
+Use `monitor update ID` flags for focused edits; complete replacement JSON needs
+explicit credential actions. Destination tests send real notifications, so run
+them when the user's task calls for testing delivery. Assignment removal changes
+alert routing; identify the exact binding before removing it.
+
+`fomkeecli self-update --check --json` checks GitHub's latest stable version without
+installing. Run `self-update --json` when the user requests updating the CLI;
+monitor-management authorization alone does not request executable replacement.
+JSON commands never trigger automatic version discovery.

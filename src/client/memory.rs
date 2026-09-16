@@ -1,4 +1,5 @@
 use crate::dto::dry_run::DryRun;
+use crate::dto::update::UpdateInput;
 use crate::dto::{CreatedMonitor, Entitlements, Monitor, MonitorPage, Session, Workspace};
 use crate::error::CliError;
 use crate::model::{MonitorId, WorkspaceId};
@@ -64,6 +65,14 @@ impl FomkeeApi for InMemoryFomkeeApi {
     ) -> Result<Response<CreatedMonitor>, CliError> {
         unconfigured()
     }
+    async fn update_monitor(
+        &self,
+        _: &WorkspaceId,
+        _: &MonitorId,
+        _: UpdateInput,
+    ) -> Result<Response<Monitor>, CliError> {
+        unconfigured()
+    }
     async fn lifecycle(
         &self,
         _: &WorkspaceId,
@@ -76,3 +85,5 @@ impl FomkeeApi for InMemoryFomkeeApi {
         unconfigured()
     }
 }
+
+mod alerting;

@@ -1,5 +1,7 @@
 use crate::alerting::RemovedAssignment;
 use crate::dto::alerting::{Assignment, Destination, DestinationTest, Page};
+use crate::dto::incidents::{Incident, IncidentEvent, PublishedNote};
+use crate::dto::maintenance::Maintenance;
 use crate::update::UpdateResult;
 use serde::Serialize;
 
@@ -68,6 +70,13 @@ pub(crate) struct DeletedMonitor {
 #[derive(Serialize)]
 #[serde(untagged)]
 pub(crate) enum CommandResult {
+    IncidentList(Response<Page<Incident>>),
+    Incident(Response<Incident>),
+    IncidentTimeline(Response<Page<IncidentEvent>>),
+    IncidentNote(Response<PublishedNote>),
+    MaintenanceList(Response<Page<Maintenance>>),
+    MaintenanceCreated(Response<Maintenance>),
+    MaintenanceCancelled(Response<Maintenance>),
     SelfUpdate(UpdateResult),
     DestinationList(Response<Page<Destination>>),
     Destination(Response<Destination>),

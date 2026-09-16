@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0
+
+- Added incident listing, details, timeline, and public note publication from
+  a message, file, or standard input.
+- Added maintenance listing, scheduling, and cancellation with explicit
+  timezones and selected monitors.
+- Added concise command help and bundled AI guidance for incident updates and
+  planned maintenance. Maintenance does not mute alerts or stop monitoring.
+
 ## 0.2.0
 
 - Added monitor updates with focused flags, secret-preserving replacement, and

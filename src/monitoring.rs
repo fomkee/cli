@@ -91,7 +91,7 @@ fn required<T>(value: Option<T>, flag: &str) -> Result<T, CliError> {
     value.ok_or_else(|| CliError::InvalidInput(format!("{flag} is required when --file is absent")))
 }
 
-fn read_text_input(path: &str) -> Result<String, CliError> {
+pub(crate) fn read_text_input(path: &str) -> Result<String, CliError> {
     if path == "-" {
         let mut text = String::new();
         io::stdin()

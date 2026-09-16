@@ -289,6 +289,8 @@ fn serialize_body(value: &impl Serialize) -> Result<Value, CliError> {
 }
 
 mod alerting;
+mod incidents;
+mod maintenance;
 
 fn page_query(limit: u32, after: Option<&str>) -> Result<String, CliError> {
     if !(1..=PAGE_SIZE).contains(&limit) {

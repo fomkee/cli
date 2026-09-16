@@ -33,6 +33,9 @@ identifier!(WorkspaceId, "workspace ID");
 identifier!(MonitorId, "monitor ID");
 identifier!(DestinationId, "destination ID");
 identifier!(AssignmentId, "assignment ID");
+identifier!(IncidentId, "incident ID");
+identifier!(IncidentEventId, "incident event ID");
+identifier!(MaintenanceId, "maintenance ID");
 
 #[cfg(test)]
 mod tests {

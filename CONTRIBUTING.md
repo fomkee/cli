@@ -41,7 +41,7 @@ useful evidence, not release verification for changed code.
 ## Releases
 
 Keep unreleased feature builds on a development version above existing stable
-releases (for example, `0.3.0-dev.1` after `0.2.0`). Otherwise self-update can replace
+releases (for example, `0.4.0-dev.1` after `0.3.0`). Otherwise self-update can replace
 a source installation with an older feature set bearing a newer version number.
 Before publishing, set the intended stable version and move the Unreleased
 changelog entries into it. Version notifications compare the embedded Cargo

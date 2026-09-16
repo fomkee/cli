@@ -1,3 +1,3 @@
 interface:
-  display_name: "Managing Fomkee Monitors"
-  short_description: "Safely manage Fomkee monitors with the CLI"
+  display_name: "Managing Fomkee"
+  short_description: "Manage monitors, incidents, and maintenance via CLI"

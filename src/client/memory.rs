@@ -87,3 +87,5 @@ impl FomkeeApi for InMemoryFomkeeApi {
 }
 
 mod alerting;
+mod incidents;
+mod maintenance;

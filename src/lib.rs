@@ -7,7 +7,9 @@ pub mod config;
 pub mod dto;
 mod duration;
 pub mod error;
+mod incidents;
 mod local_commands;
+mod maintenance;
 pub mod model;
 pub mod monitoring;
 mod output;
@@ -67,6 +69,8 @@ pub async fn run_process() -> ExitCode {
             cli.command,
             Command::Monitor { .. }
                 | Command::Destination { .. }
+                | Command::Incident { .. }
+                | Command::Maintenance { .. }
                 | Command::Entitlement { .. }
                 | Command::Auth { .. }
         ))
@@ -224,6 +228,8 @@ async fn execute(cli: Cli, presentation: &mut Presentation) -> Result<CommandRes
             .await
             .map(CommandResult::Entitlement),
         Command::Destination { command } => alerting::execute(&api, &workspace, command).await,
+        Command::Incident { command } => incidents::execute(&api, &workspace, command).await,
+        Command::Maintenance { command } => maintenance::execute(&api, &workspace, command).await,
         Command::Monitor { command } => {
             monitor_command(
                 &api,

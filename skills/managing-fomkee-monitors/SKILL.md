@@ -1,6 +1,6 @@
 ---
 name: managing-fomkee-monitors
-description: Manage Fomkee HTTP, Function, and Heartbeat monitors through fomkeecli with explicit JSON output. Use for monitor inspection, creation, updates, lifecycle changes, alert destinations and assignments; do not use for invitations or MCP.
+description: Manage Fomkee HTTP, Function, and Heartbeat monitors through fomkeecli with explicit JSON output. Use for monitor inspection, creation, updates, lifecycle changes, alert destinations and assignments, incident inspection and public notes, and planned maintenance; do not use for invitations or MCP.
 ---
 
 # Manage Fomkee monitors
@@ -25,7 +25,7 @@ monitor list --output json` before proposing a creation. Follow
 results. Server validation and effective entitlements are authoritative: do
 not invent identifiers, plan limits, or required values.
 
-For creation, obtain a complete request JSON file using the matching public
+For monitor creation, obtain a complete request JSON file using the matching public
 schema. Dry-run HTTP and Function configurations first using `fomkeecli monitor
 dry-run --file FILE --output json`. Heartbeats have no unsaved dry-run API.
 When a Function monitor or Heartbeat validator needs `js_source`, use the
@@ -62,3 +62,8 @@ alert routing; identify the exact binding before removing it.
 installing. Run `self-update --json` when the user requests updating the CLI;
 monitor-management authorization alone does not request executable replacement.
 JSON commands never trigger automatic version discovery.
+
+For incident inspection, public notes, or scheduling/cancelling maintenance, read
+[incidents and maintenance](references/incidents-maintenance.md). Maintenance
+announces planned work; checks and alerts continue. Incident posts are public
+updates, not private comments, and do not change incident status.

@@ -235,3 +235,6 @@ async fn test_complete_destination_update_is_forwarded_without_detail_fetch() {
     // Assert
     assert_eq!(result, destination());
 }
+
+#[path = "management/operations.rs"]
+mod operations;

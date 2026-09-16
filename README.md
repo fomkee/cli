@@ -118,3 +118,32 @@ executable while preserving permissions. It never downgrades, installs a
 prerelease, or falls back to an unchecked download. The installation directory
 must be writable; there is no automatic privilege escalation. The next invocation
 uses the new version. Other platforms must build from source.
+
+## Incidents and maintenance
+
+```sh
+fomkeecli incident list
+fomkeecli incident list --monitor MONITOR_ID
+fomkeecli incident get INCIDENT_ID
+fomkeecli incident timeline INCIDENT_ID
+fomkeecli incident post INCIDENT_ID --message "We are investigating the outage."
+fomkeecli incident post INCIDENT_ID --message-file update.txt
+
+fomkeecli maintenance list
+fomkeecli maintenance create --title "Database upgrade" \
+  --start 2030-10-01T09:00:00+02:00 --end 2030-10-01T10:00:00+02:00 \
+  --monitor MONITOR_ID
+fomkeecli maintenance cancel MAINTENANCE_ID
+```
+
+Replace example dates and IDs with your intended schedule and monitors. Notes
+are public-facing, immutable updates visible on status pages containing the
+monitor; they do not change incident status. Maintenance announces planned work;
+**checks, incidents, and alerts continue normally**.
+
+Use `--json` for automation and `--after` for subsequent pages. Incident listing
+includes all states; `open` and `regressed` identify ongoing incidents. Maintenance
+creation requires timezone-explicit start/end times and one or more `--monitor`
+IDs. It also accepts a complete JSON file through `--file` (`-` reads stdin).
+See the bundled [agent workflow](skills/managing-fomkee-monitors/references/incidents-maintenance.md)
+for examples, input shape, and handling uncertain outcomes.

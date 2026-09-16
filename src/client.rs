@@ -8,7 +8,11 @@ use crate::wire::Response;
 use async_trait::async_trait;
 
 mod alerting;
+mod incidents;
+mod maintenance;
 pub use alerting::AlertingApi;
+pub use incidents::IncidentApi;
+pub use maintenance::MaintenanceApi;
 mod http;
 mod memory;
 pub use http::HttpFomkeeApi;
@@ -16,7 +20,7 @@ pub use memory::InMemoryFomkeeApi;
 
 /// Public HTTP API port; success always carries the validated endpoint representation.
 #[async_trait]
-pub trait FomkeeApi: AlertingApi + Send + Sync {
+pub trait FomkeeApi: AlertingApi + IncidentApi + MaintenanceApi + Send + Sync {
     /// Resolve the token's current workspace identity.
     async fn session(&self) -> Result<Response<Session>, CliError>;
     /// Fetch public metadata for the authenticated workspace.

@@ -26,6 +26,12 @@ pub(super) const SKILLS: &[Skill] = &[
                 include_bytes!("../../skills/managing-fomkee-monitors/references/monitor-types.md"),
             ),
             (
+                "references/incidents-maintenance.md",
+                include_bytes!(
+                    "../../skills/managing-fomkee-monitors/references/incidents-maintenance.md"
+                ),
+            ),
+            (
                 "references/safety.md",
                 include_bytes!("../../skills/managing-fomkee-monitors/references/safety.md"),
             ),

@@ -2,7 +2,7 @@ use super::context::DisplayContext;
 use super::format::text;
 use super::layout::Ui;
 use super::theme::Verdict;
-use super::{alerting, connection, dry_run, monitor, skill};
+use super::{alerting, connection, dry_run, incidents, maintenance, monitor, skill};
 use crate::error::CliError;
 use crate::error::response::ResponseOutcome;
 use crate::result::CommandResult;
@@ -16,6 +16,34 @@ pub(super) fn render(
 ) -> String {
     let mut ui = Ui::new(width, color);
     match result {
+        CommandResult::IncidentList(value) => {
+            incidents::list(&mut ui, value.data(), details);
+            ui.finish()
+        }
+        CommandResult::Incident(value) => {
+            incidents::detail(&mut ui, value.data(), details);
+            ui.finish()
+        }
+        CommandResult::IncidentTimeline(value) => {
+            incidents::timeline(&mut ui, value.data());
+            ui.finish()
+        }
+        CommandResult::IncidentNote(value) => {
+            incidents::published(&mut ui, value.data());
+            ui.finish()
+        }
+        CommandResult::MaintenanceList(value) => {
+            maintenance::list(&mut ui, value.data(), details);
+            ui.finish()
+        }
+        CommandResult::MaintenanceCreated(value) => {
+            maintenance::detail(&mut ui, value.data(), "Scheduled maintenance", details);
+            ui.finish()
+        }
+        CommandResult::MaintenanceCancelled(value) => {
+            maintenance::detail(&mut ui, value.data(), "Cancelled maintenance", details);
+            ui.finish()
+        }
         CommandResult::SelfUpdate(value) => {
             ui.title(if value.updated {
                 "Updated fomkeecli"

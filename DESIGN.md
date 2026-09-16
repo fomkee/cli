@@ -206,3 +206,21 @@ and one-time secrets. Tests must be deterministic and offline.
   cache attempts for a day, bound notification latency to two seconds, print to
   stderr, and allow `--no-update-check` / `FOMKEE_NO_UPDATE_CHECK=1`. Preserve command
   success when optional discovery fails. JSON and offline commands never trigger it.
+
+## Incidents and maintenance
+
+- `incident list` returns one page of all lifecycle states; `--monitor ID`
+  selects the monitor-specific endpoint. `get` and `timeline` expose incident
+  identity, status, and history without hidden extra requests.
+- `incident post ID --message TEXT|--message-file FILE` publishes a public-facing
+  note. Help must explain visibility and that notes do not change lifecycle.
+  File input is plain text, with `-` for stdin. Never retry the POST automatically.
+- `maintenance list/create/cancel` uses the existing announcement lifecycle.
+  Creation requires explicit affected monitors and RFC3339 start/end timestamps
+  with a timezone. Server validation owns future-start and scheduling policy.
+  Complete `--file` JSON is forwarded without overriding supplied fields.
+- Maintenance does not mute alerts or stop monitoring. Human help and AI guidance
+  must state that checks, incidents, and alerts continue normally.
+- Lists show status, readable dates, IDs, and continuation cursors; narrow views
+  stack records. Incident notes are escaped public prose. Maintenance creation
+  and cancellation show the returned schedule and affected monitors.

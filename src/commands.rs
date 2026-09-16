@@ -1,5 +1,7 @@
 use crate::alerting::DestinationCommand;
+use crate::incidents::IncidentCommand;
 use crate::local_commands::ConfigCommand;
+use crate::maintenance::MaintenanceCommand;
 use crate::model::DestinationId;
 use crate::model::MonitorId;
 use crate::monitoring::CreateCommand;
@@ -46,6 +48,16 @@ pub struct Cli {
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum Command {
+    /// Inspect incidents and publish public updates.
+    Incident {
+        #[command(subcommand)]
+        command: IncidentCommand,
+    },
+    /// Schedule and manage planned maintenance.
+    Maintenance {
+        #[command(subcommand)]
+        command: MaintenanceCommand,
+    },
     /// Update fomkeecli to the latest stable version.
     SelfUpdate {
         /// Check for a new version without installing it.
@@ -210,4 +222,14 @@ pub(crate) struct InputFile {
     /// JSON settings file; use - to read from standard input.
     #[arg(long, default_value = "-")]
     pub(crate) file: String,
+}
+
+#[derive(Debug, Args)]
+pub(crate) struct PageArgs {
+    /// Maximum results to show, from 1 to 100.
+    #[arg(long, default_value_t = 100)]
+    pub limit: u32,
+    /// Continue from a previous result's next_cursor.
+    #[arg(long)]
+    pub after: Option<String>,
 }

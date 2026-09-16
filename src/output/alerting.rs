@@ -95,7 +95,7 @@ pub(super) fn test(ui: &mut Ui, value: &DestinationTest) {
         ("Attempted".into(), timestamp(&value.attempted_at)),
     ]);
 }
-fn continuation(ui: &mut Ui, cursor: Option<&str>) {
+pub(super) fn continuation(ui: &mut Ui, cursor: Option<&str>) {
     if let Some(cursor) = cursor {
         ui.hint(&format!(
             "More results available. Continue with --after {}",

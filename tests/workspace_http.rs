@@ -166,7 +166,7 @@ async fn test_http_discovery_persists_workspace_for_later_cli_invocations() {
     assert_success(
         &output,
         json!({"active": "personal", "workspaces": [{"alias": "personal", "active": true,
-        "api_url": server.origin, "workspace_id": WORKSPACE, "name": "Personal", "slug": "personal", "credential_store": "keyring"}]}),
+        "api_url": server.origin, "workspace_id": WORKSPACE, "name": "Personal", "credential_store": "keyring"}]}),
     );
     server.finish(2).await;
 }

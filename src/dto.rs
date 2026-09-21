@@ -24,7 +24,6 @@ pub struct Session {
 pub struct Workspace {
     pub id: WorkspaceId,
     pub name: String,
-    pub slug: String,
 }
 
 /// Public monitor kind, shared by request and presentation decisions.

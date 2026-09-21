@@ -63,10 +63,7 @@ fn profile(ui: &mut Ui, value: &ProfileOutput, details: bool) {
     if details {
         ui.section_fields(
             "Identity",
-            vec![
-                ("Workspace ID", Some(value.workspace_id.to_string())),
-                ("Slug", Some(text(&value.slug))),
-            ],
+            vec![("Workspace ID", Some(value.workspace_id.to_string()))],
         );
     }
 }

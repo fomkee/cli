@@ -61,7 +61,7 @@ impl Drop for Server {
 
 fn serve(listener: TcpListener, entered: Sender<()>, release: Receiver<()>) -> io::Result<()> {
     let session = json!({"workspace_id":WORKSPACE,"role":"ApiKey"});
-    let workspace = json!({"id":WORKSPACE,"name":"Remote","slug":"remote"});
+    let workspace = json!({"id":WORKSPACE,"name":"Remote"});
     for (index, body) in [session, workspace].into_iter().enumerate() {
         let mut stream = raw_http::accept(&listener)?;
         raw_http::read_request(&mut stream)?;
@@ -185,7 +185,6 @@ fn profile() -> WorkspaceProfile {
         api_url: "https://primary.fomkee.dev".into(),
         workspace_id: WORKSPACE.parse().unwrap(),
         name: "Existing".into(),
-        slug: "existing".into(),
         credential_id: CredentialId::generate().unwrap(),
         credential_store: CredentialBackend::Keyring,
     }

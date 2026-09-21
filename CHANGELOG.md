@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1
+
+- Removed workspace slug metadata. Connections retain local aliases bound to
+  workspace IDs; existing profile files remain readable.
+
 ## 0.3.0
 
 - Added incident listing, details, timeline, and public note publication from

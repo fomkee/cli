@@ -57,7 +57,6 @@ pub fn connect(
         api_url: config.base_url.to_string(),
         workspace_id,
         name: workspace.name,
-        slug: workspace.slug,
         credential_id,
         credential_store,
     };
@@ -194,7 +193,6 @@ fn profile_output(
         api_url: profile.api_url.clone(),
         workspace_id: profile.workspace_id,
         name: profile.name.clone(),
-        slug: profile.slug.clone(),
         active,
         credential_store: profile.credential_store,
         credential_storage_notice: (profile.credential_store == CredentialBackend::File).then(

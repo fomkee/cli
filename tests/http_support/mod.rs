@@ -42,9 +42,7 @@ impl ApiServer {
             .route("/api/session", get(session))
             .route(
                 &format!("/api/workspaces/{WORKSPACE}"),
-                get(|| async {
-                    Json(json!({"id": WORKSPACE, "name": "Personal", "slug": "personal"}))
-                }),
+                get(|| async { Json(json!({"id": WORKSPACE, "name": "Personal"})) }),
             )
             .route(
                 &format!("/api/workspaces/{WORKSPACE}/monitors"),
@@ -190,7 +188,6 @@ impl Process {
                 api_url: origin.into(),
                 workspace_id: WORKSPACE.parse().unwrap(),
                 name: "Personal".into(),
-                slug: "personal".into(),
                 credential_id: CredentialId::generate().unwrap(),
                 credential_store: CredentialBackend::Keyring,
             },

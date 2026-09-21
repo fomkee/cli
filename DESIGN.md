@@ -224,3 +224,7 @@ and one-time secrets. Tests must be deterministic and offline.
 - Lists show status, readable dates, IDs, and continuation cursors; narrow views
   stack records. Incident notes are escaped public prose. Maintenance creation
   and cancellation show the returned schedule and affected monitors.
+
+Workspace connections use local aliases bound to immutable workspace IDs.
+Workspace names are editable and non-unique; profiles and output have no workspace slug.
+Legacy profile slug fields are ignored when reading existing configuration.

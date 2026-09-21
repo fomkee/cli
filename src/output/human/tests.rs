@@ -293,7 +293,7 @@ fn test_workspace_disconnect_explains_local_only_effect() {
 #[test]
 fn test_file_storage_is_neutral_without_a_repeated_warning() {
     // Arrange
-    let value = json!({"alias":"personal","name":"Personal","active":true,"workspace_id":"00000000-0000-0000-0000-000000000001","slug":"personal",
+    let value = json!({"alias":"personal","name":"Personal","active":true,"workspace_id":"00000000-0000-0000-0000-000000000001",
         "api_url":"https://primary.fomkee.dev", "credential_store":"file",
         "credential_storage_notice":"Token stored unencrypted in the protected local credentials.toml file."});
 

@@ -14,7 +14,6 @@ pub struct ProfileOutput {
     pub api_url: String,
     pub workspace_id: WorkspaceId,
     pub name: String,
-    pub slug: String,
     pub active: bool,
     pub credential_store: CredentialBackend,
     #[serde(skip_serializing_if = "Option::is_none")]

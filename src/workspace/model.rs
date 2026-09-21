@@ -92,7 +92,6 @@ pub struct WorkspaceProfile {
     pub api_url: String,
     pub workspace_id: WorkspaceId,
     pub name: String,
-    pub slug: String,
     pub credential_id: CredentialId,
     #[serde(default)]
     pub credential_store: CredentialBackend,

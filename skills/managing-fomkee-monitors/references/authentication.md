@@ -1,8 +1,8 @@
 # Authentication
 
 Each workspace connection uses its own existing API key. `workspace connect
-ALIAS` validates the key through `/api/session`, fetches the workspace's name
-and slug, and saves the token in the OS keyring or protected TOML file. The default API origin is
+ALIAS` validates the key through `/api/session`, fetches the workspace's ID and name,
+and saves the token in the OS keyring or protected TOML file. The default API origin is
 `https://primary.fomkee.dev`; `connect --api-url ORIGIN` can select another
 deployment. No browser login or account-wide credential is involved.
 

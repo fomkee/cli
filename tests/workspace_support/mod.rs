@@ -70,7 +70,7 @@ pub async fn two_workspaces() -> Scenario {
 
 pub fn expected_connection(alias: &str, id: &str, active: bool) -> Value {
     json!({"alias": alias, "api_url": "https://primary.fomkee.dev/", "workspace_id": id,
-        "name": "Test workspace", "slug": "test-workspace", "active": active, "credential_store": "keyring"})
+        "name": "Test workspace", "active": active, "credential_store": "keyring"})
 }
 
 pub fn assert_saved_connection(scenario: &Scenario, name: &str, id: &str) {
@@ -172,7 +172,6 @@ fn registry() -> WorkspaceRegistry {
             api_url: DEFAULT_API_URL.into(),
             workspace_id: FIRST.parse().unwrap(),
             name: "Personal".into(),
-            slug: "personal".into(),
             credential_id: CredentialId::generate().unwrap(),
             credential_store: CredentialBackend::Keyring,
         },

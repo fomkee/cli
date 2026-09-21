@@ -35,7 +35,7 @@ impl FomkeeApi for InMemoryFomkeeApi {
         if *workspace != self.workspace {
             return unconfigured();
         }
-        Response::parse(json!({"id":workspace,"name":"Test workspace","slug":"test-workspace"}))
+        Response::parse(json!({"id":workspace,"name":"Test workspace"}))
     }
     async fn entitlements(&self, _: &WorkspaceId) -> Result<Response<Entitlements>, CliError> {
         unconfigured()

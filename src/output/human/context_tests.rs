@@ -31,7 +31,7 @@ fn test_named_workspace_and_hosted_link_are_shown_in_references() {
     // Assert
     assert!(output.contains(&format!("Workspace  Personal ({WORKSPACE})")));
     assert!(output.contains(&format!(
-        "In Fomkee\n    https://app.fomkee.dev/monitors/{MONITOR}"
+        "In Fomkee\n    https://app.fomkee.com/monitors/{MONITOR}"
     )));
 }
 
@@ -69,7 +69,7 @@ fn test_custom_api_origin_does_not_create_a_hosted_app_link() {
     let output = render(&monitor(), Fixture::MonitorGet, false, 120, false, &context);
 
     // Assert
-    assert!(!output.contains("app.fomkee.dev") && !output.contains("In Fomkee"));
+    assert!(!output.contains("app.fomkee.com") && !output.contains("In Fomkee"));
 }
 
 #[test]
@@ -85,7 +85,7 @@ fn test_environment_connection_does_not_display_a_bare_workspace_id() {
 
     // Assert
     assert!(!output.contains(WORKSPACE));
-    assert!(output.contains("app.fomkee.dev"));
+    assert!(output.contains("app.fomkee.com"));
 }
 
 #[test]

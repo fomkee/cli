@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0
+
+- Changed the hosted API default and app links from `fomkee.dev` to
+  `fomkee.com`. Existing saved connections to `primary.fomkee.dev` remain
+  recognized as hosted connections during the migration.
+
 ## 0.3.1
 
 - Removed workspace slug metadata. Connections retain local aliases bound to

@@ -5,7 +5,10 @@ use url::Url;
 use crate::error::CliError;
 
 /// Hosted primary origin used unless the invocation selects another API.
-pub const DEFAULT_API_URL: &str = "https://primary.fomkee.dev";
+pub const DEFAULT_API_URL: &str = "https://primary.fomkee.com";
+
+pub(crate) const DEFAULT_APP_URL: &str = "https://app.fomkee.com";
+const LEGACY_API_URL: &str = "https://primary.fomkee.dev";
 
 /// Process configuration whose secret token deliberately has no Debug implementation.
 pub struct Config {
@@ -70,6 +73,43 @@ pub fn api_url(value: &str) -> Result<Url, CliError> {
     Ok(url)
 }
 
+pub(crate) fn is_hosted_api_url(url: &Url) -> bool {
+    matches!(
+        url.as_str().trim_end_matches('/'),
+        DEFAULT_API_URL | LEGACY_API_URL
+    )
+}
+
 fn invalid_origin() -> CliError {
     CliError::InvalidInput("API URL must be an HTTPS origin without credentials, path, query, or fragment (HTTP is allowed for loopback development)".into())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_current_and_legacy_hosted_origins_are_recognized() {
+        // Arrange
+        let current = api_url(DEFAULT_API_URL).unwrap();
+        let legacy = api_url(LEGACY_API_URL).unwrap();
+
+        // Act
+        let recognized = (is_hosted_api_url(&current), is_hosted_api_url(&legacy));
+
+        // Assert
+        assert_eq!(recognized, (true, true));
+    }
+
+    #[test]
+    fn test_custom_origin_is_not_recognized_as_hosted() {
+        // Arrange
+        let custom = api_url("https://monitoring.example.com").unwrap();
+
+        // Act
+        let hosted = is_hosted_api_url(&custom);
+
+        // Assert
+        assert!(!hosted);
+    }
 }

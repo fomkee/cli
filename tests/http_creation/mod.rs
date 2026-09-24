@@ -225,6 +225,6 @@ async fn test_saved_workspace_name_is_rendered_without_a_decoration_lookup() {
     assert!(output.status.success(), "{output:?}");
     let stdout = String::from_utf8(output.stdout).unwrap();
     assert!(stdout.contains(&format!("Workspace  Personal ({WORKSPACE})")));
-    assert!(!stdout.contains("app.fomkee.dev") && !stdout.contains("stored unencrypted"));
+    assert!(!stdout.contains("app.fomkee.com") && !stdout.contains("stored unencrypted"));
     server.finish(4).await;
 }

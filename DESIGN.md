@@ -82,7 +82,7 @@ argument errors follow the same color policy.
   than printing an unexplained UUID. Never substitute an alias for a real name
   or make a decorative lookup. Omit creator UUIDs; the current API supplies no
   creator display name.
-- **In Fomkee:** link to `https://app.fomkee.dev/monitors/{id}` in monitor get
+- **In Fomkee:** link to `https://app.fomkee.com/monitors/{id}` in monitor get
   and successful create/lifecycle output for the hosted primary API only.
   Validate the monitor ID before constructing the URL. Keep it plain and
   copyable; do not automatically open a browser or fabricate links for custom
@@ -163,7 +163,7 @@ argument errors follow the same color policy.
     Monitor    361aca90-733d-4b11-a398-ad961bfd7e48
 
   In Fomkee
-    https://app.fomkee.dev/monitors/361aca90-733d-4b11-a398-ad961bfd7e48
+    https://app.fomkee.com/monitors/361aca90-733d-4b11-a398-ad961bfd7e48
 
   Use --details for secondary settings and history.
 

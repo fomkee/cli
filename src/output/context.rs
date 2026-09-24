@@ -1,4 +1,4 @@
-use crate::config::DEFAULT_API_URL;
+use crate::config::is_hosted_api_url;
 use crate::model::WorkspaceId;
 use crate::workspace::Connection;
 
@@ -14,7 +14,7 @@ impl DisplayContext {
             workspace: connection
                 .workspace_name()
                 .map(|name| (workspace, name.to_owned())),
-            hosted: connection.config.base_url.as_str().trim_end_matches('/') == DEFAULT_API_URL,
+            hosted: is_hosted_api_url(&connection.config.base_url),
         }
     }
 }

@@ -3,6 +3,7 @@ use super::context::DisplayContext;
 use super::format::{duration, milliseconds, text, timestamp};
 use super::layout::Ui;
 use super::theme::Verdict;
+use crate::config::DEFAULT_APP_URL;
 use crate::dto::{CreatedMonitor, Monitor, MonitorConfig, MonitorPage, Schedule};
 use crate::result::MonitorAction;
 use settings::settings;
@@ -176,7 +177,7 @@ fn references(ui: &mut Ui, monitor: &Monitor, context: &DisplayContext) {
 fn app_link(ui: &mut Ui, monitor: &Monitor, context: &DisplayContext) {
     if context.hosted {
         ui.section("In Fomkee");
-        ui.line(&format!("  https://app.fomkee.dev/monitors/{}", monitor.id));
+        ui.line(&format!("  {DEFAULT_APP_URL}/monitors/{}", monitor.id));
     }
 }
 

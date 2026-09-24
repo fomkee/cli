@@ -1,6 +1,6 @@
 # Fomkee CLI
 
-Manage your [Fomkee](https://fomkee.dev) monitors without leaving your terminal.
+Manage your [Fomkee](https://fomkee.com) monitors without leaving your terminal.
 
 Add a health endpoint, keep an eye on a scheduled job, or bring your coding
 agent along to help write a custom check. `fomkeecli` connects these workflows
@@ -20,7 +20,7 @@ On Windows, download `fomkeecli-Windows-x86_64.exe` from
 [Releases](https://github.com/fomkee/cli/releases/latest), rename it to
 `fomkeecli.exe`, and put it in a folder on your `PATH`.
 
-Next, open [the Fomkee app](https://app.fomkee.dev) and create an API key in your
+Next, open [the Fomkee app](https://app.fomkee.com) and create an API key in your
 workspace's settings. Have the token ready, then connect and add your first monitor:
 
 ```sh

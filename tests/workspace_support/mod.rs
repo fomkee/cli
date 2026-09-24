@@ -69,7 +69,7 @@ pub async fn two_workspaces() -> Scenario {
 }
 
 pub fn expected_connection(alias: &str, id: &str, active: bool) -> Value {
-    json!({"alias": alias, "api_url": "https://primary.fomkee.dev/", "workspace_id": id,
+    json!({"alias": alias, "api_url": "https://primary.fomkee.com/", "workspace_id": id,
         "name": "Test workspace", "active": active, "credential_store": "keyring"})
 }
 
@@ -77,7 +77,7 @@ pub fn assert_saved_connection(scenario: &Scenario, name: &str, id: &str) {
     let (_, profile) = service::selected_profile(&scenario.store, Some(&alias(name))).unwrap();
     let config = service::profile_config(&profile, &scenario.stores()).unwrap();
     assert_eq!(profile.workspace_id.to_string(), id);
-    assert_eq!(config.base_url.as_str(), "https://primary.fomkee.dev/");
+    assert_eq!(config.base_url.as_str(), "https://primary.fomkee.com/");
     assert!(
         !serde_json::to_string(&scenario.store.load().unwrap())
             .unwrap()
